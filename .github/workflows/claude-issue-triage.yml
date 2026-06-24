@@ -53,6 +53,10 @@ jobs:
             ---
             *Triage automático generado por Claude*
 
+            Asegúrate de que el comentario esté escrito en Markdown válido compatible con GitHub:
+            usa encabezados `##`, negrita `**texto**`, listas con `-`, y bloques de código con backticks.
+            No uses HTML ni sintaxis que GitHub no renderice en comentarios de issues.
+
             Contexto del proyecto: es un juego de Tetris en JavaScript puro (sin dependencias).
             Los ficheros principales son `index.html` (DOM y canvas), `style.css` (estilos retro) y
             `game.js` (~300 líneas, toda la lógica: board 20×10, loop de animación, colisiones,
