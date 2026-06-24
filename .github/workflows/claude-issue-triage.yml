@@ -1,0 +1,61 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Analizar y clasificar issue con Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*)"'
+          prompt: |
+            Analiza el issue #${{ github.event.issue.number }} del repositorio ${{ github.repository }}.
+
+            Tu tarea:
+            1. Lee el título y el cuerpo del issue con `gh issue view ${{ github.event.issue.number }} --repo ${{ github.repository }}`.
+            2. Consulta los labels disponibles con `gh label list --repo ${{ github.repository }}`.
+               SOLO puedes usar labels que ya existan; NO crees labels nuevos.
+            3. Asigna los labels más apropiados con:
+               `gh issue edit ${{ github.event.issue.number }} --repo ${{ github.repository }} --add-label "<label1>,<label2>"`
+               Asigna al menos 1 label y como máximo 3. Elige los que mejor describan la naturaleza del issue.
+            4. Publica UN comentario en español con el diagnóstico general usando:
+               `gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "<diagnóstico>"`
+
+            El diagnóstico debe seguir esta estructura:
+
+            ## 🔍 Diagnóstico del Issue
+
+            **Resumen:** <resumen breve del problema o petición>
+
+            **Área afectada:** <archivo(s) del juego involucrados — index.html, style.css, game.js — y qué parte concreta>
+
+            **Análisis:** <posible causa raíz o motivación técnica>
+
+            **Enfoque sugerido:** <líneas de solución a alto nivel, sin implementar código>
+
+            **Información faltante:** <lo que hace falta saber para resolverlo, si aplica; omitir sección si no aplica>
+
+            ---
+            *Triage automático generado por Claude*
+
+            Contexto del proyecto: es un juego de Tetris en JavaScript puro (sin dependencias).
+            Los ficheros principales son `index.html` (DOM y canvas), `style.css` (estilos retro) y
+            `game.js` (~300 líneas, toda la lógica: board 20×10, loop de animación, colisiones,
+            rotaciones con wall-kicks, scoring, niveles). La UI está en español.
+
+            Sé conciso y técnico. No implementes la solución, solo diagnostica.
