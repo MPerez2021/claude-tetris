@@ -169,7 +169,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -300,5 +300,21 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+const themeToggle = document.getElementById('theme-toggle');
+const switchText = document.getElementById('switch-text');
+
+themeToggle.addEventListener('change', () => {
+  const isLight = themeToggle.checked;
+  document.body.classList.toggle('light-mode', isLight);
+  switchText.textContent = isLight ? 'Light' : 'Dark';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+});
+
+if (localStorage.getItem('theme') === 'light') {
+  themeToggle.checked = true;
+  document.body.classList.add('light-mode');
+  switchText.textContent = 'Light';
+}
 
 init();
