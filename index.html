@@ -53,10 +53,24 @@
       </aside>
     </div>
 
+    <div id="highscores" class="highscores-section">
+      <div class="highscores-header">
+        <span class="label">RÉCORDS</span>
+        <button id="reset-records-btn">Resetear records</button>
+      </div>
+      <div id="highscores-table-wrap"></div>
+      <div id="highscores-bests" class="highscores-bests"></div>
+    </div>
+
     <div id="overlay" class="overlay hidden">
       <div class="overlay-box">
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
+        <div id="name-entry" class="name-entry hidden">
+          <p class="name-entry-label">¡Nuevo récord! Ingresa tu nombre:</p>
+          <input id="score-name-input" type="text" maxlength="12" placeholder="Tu nombre" autocomplete="off" />
+          <button id="score-name-confirm">Guardar</button>
+        </div>
         <button id="restart-btn">Reiniciar</button>
       </div>
     </div>

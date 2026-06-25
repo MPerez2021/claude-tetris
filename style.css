@@ -206,6 +206,130 @@ kbd {
   background: var(--btn-hover);
 }
 
+/* ---- High-scores section ---- */
+.highscores-section {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.highscores-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#reset-records-btn {
+  background: transparent;
+  color: var(--label-color);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+#reset-records-btn:hover {
+  color: var(--fg);
+  border-color: var(--accent);
+}
+
+.highscores-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+}
+
+.highscores-table th {
+  text-align: left;
+  color: var(--label-color);
+  font-size: 10px;
+  letter-spacing: 1px;
+  font-weight: 600;
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid var(--board-border);
+}
+
+.highscores-table td {
+  padding: 5px 8px 5px 0;
+  color: var(--fg);
+  border-bottom: 1px solid var(--grid-color);
+}
+
+.highscores-table tr.new-record td {
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-shadow);
+}
+
+.highscores-empty {
+  color: var(--label-color);
+  font-size: 12px;
+  padding: 6px 0;
+}
+
+.highscores-bests {
+  font-size: 12px;
+  color: var(--control-color);
+  display: flex;
+  gap: 20px;
+  padding-top: 4px;
+}
+
+/* ---- Name entry in overlay ---- */
+.name-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.name-entry.hidden {
+  display: none;
+}
+
+.name-entry-label {
+  font-size: 13px;
+  color: var(--accent);
+}
+
+#score-name-input {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  padding: 6px 12px;
+  text-align: center;
+  width: 160px;
+  outline: none;
+}
+
+#score-name-input:focus {
+  border-color: var(--accent);
+}
+
+#score-name-confirm {
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#score-name-confirm:hover {
+  background: var(--btn-hover);
+}
+
 /* ---- Theme Toggle ---- */
 .theme-switch {
   display: flex;
