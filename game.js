@@ -4,17 +4,23 @@ const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
 
-const COLORS = [
-  null,
-  '#4dd0e1', // I - cyan
-  '#ffd54f', // O - yellow
-  '#ba68c8', // T - purple
-  '#81c784', // S - green
-  '#e57373', // Z - red
-  '#64B5F6', // J - pale blue
-  '#ffb74d', // L - orange
-  '#90a4ae', // Tuerca - gris metálico
-];
+const COLORS_RETRO  = [null, '#4dd0e1', '#ffd54f', '#ba68c8', '#81c784', '#e57373', '#64B5F6', '#ffb74d', '#90a4ae'];
+const COLORS_NEON   = [null, '#00eeff', '#ffee00', '#cc44ff', '#44ff88', '#ff3355', '#44aaff', '#ff8800', '#aabbcc'];
+const COLORS_PASTEL = [null, '#a8d8ea', '#ffeaa7', '#d7aefb', '#b5ead7', '#ffb7b2', '#b5c9f7', '#ffd6a5', '#c9d6df'];
+const COLORS_PIXEL  = [null, '#4dd0e1', '#ffd54f', '#ba68c8', '#81c784', '#e57373', '#64B5F6', '#ffb74d', '#90a4ae'];
+
+let activeSkin = localStorage.getItem('tetris-skin') || 'retro';
+
+function getColors() {
+  if (activeSkin === 'neon') return COLORS_NEON;
+  if (activeSkin === 'pastel') return COLORS_PASTEL;
+  if (activeSkin === 'pixel') return COLORS_PIXEL;
+  return COLORS_RETRO;
+}
+
+function applyNeonBackground() {
+  canvas.style.background = activeSkin === 'neon' ? '#000' : '';
+}
 
 const PIECES = [
   null,
@@ -158,15 +164,54 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
-function drawBlock(context, x, y, colorIndex, size, alpha) {
+function drawBlock(context, x, y, colorIndex, size, alpha, bgColor) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
+  const color = getColors()[colorIndex];
+  const px = x * size + 1;
+  const py = y * size + 1;
+  const w = size - 2;
+  const h = size - 2;
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+
+  if (activeSkin === 'neon') {
+    context.shadowBlur = 14;
+    context.shadowColor = color;
+    context.fillStyle = color;
+    context.fillRect(px, py, w, h);
+    context.shadowBlur = 0;
+    context.shadowColor = 'transparent';
+  } else if (activeSkin === 'pastel') {
+    context.fillStyle = color;
+    context.fillRect(px, py, w, h);
+    const cornerSize = 3;
+    const bg = bgColor || getComputedStyle(context.canvas).backgroundColor;
+    context.globalAlpha = 1;
+    context.fillStyle = bg;
+    context.fillRect(px, py, cornerSize, cornerSize);
+    context.fillRect(px + w - cornerSize, py, cornerSize, cornerSize);
+    context.fillRect(px, py + h - cornerSize, cornerSize, cornerSize);
+    context.fillRect(px + w - cornerSize, py + h - cornerSize, cornerSize, cornerSize);
+  } else if (activeSkin === 'pixel') {
+    context.fillStyle = color;
+    context.fillRect(px, py, w, h);
+    context.fillStyle = 'rgba(0,0,0,0.15)';
+    const cell = 4;
+    const cols = Math.floor(w / cell);
+    const rows = Math.floor(h / cell);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        if ((row + col) % 2 === 0) {
+          context.fillRect(px + col * cell, py + row * cell, cell, cell);
+        }
+      }
+    }
+  } else {
+    context.fillStyle = color;
+    context.fillRect(px, py, w, h);
+    context.fillStyle = 'rgba(255,255,255,0.12)';
+    context.fillRect(px, py, w, 4);
+  }
+
   context.globalAlpha = 1;
 }
 
@@ -231,7 +276,7 @@ function draw() {
   // board
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++)
-      drawBlock(ctx, c, r, board[r][c], BLOCK);
+      drawBlock(ctx, c, r, board[r][c], BLOCK, 1, boardBg);
 
   // huecos circulares de tuercas fijadas en el tablero
   for (let r = 0; r < ROWS; r++)
@@ -244,14 +289,14 @@ function draw() {
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       if (current.shape[r][c])
-        drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
+        drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2, boardBg);
   if (current.type === 8)
     drawNutHole(ctx, current.x + 1, gy + 1, BLOCK, boardBg, 0.2);
 
   // current piece
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
-      drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+      drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK, 1, boardBg);
   if (current.type === 8)
     drawNutHole(ctx, current.x + 1, current.y + 1, BLOCK, boardBg);
 }
@@ -262,11 +307,11 @@ function drawNext() {
   const shape = next.shape;
   const offX = Math.floor((4 - shape[0].length) / 2);
   const offY = Math.floor((4 - shape.length) / 2);
+  const nextBg = getComputedStyle(nextCanvas).backgroundColor;
   for (let r = 0; r < shape.length; r++)
     for (let c = 0; c < shape[r].length; c++)
-      drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB);
+      drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB, 1, nextBg);
   if (next.type === 8) {
-    const nextBg = getComputedStyle(nextCanvas).backgroundColor;
     drawNutHole(nextCtx, offX + 1, offY + 1, NB, nextBg);
   }
 }
@@ -370,5 +415,17 @@ if (localStorage.getItem('theme') === 'light') {
   document.body.classList.add('light-mode');
   switchText.textContent = 'Light';
 }
+
+const skinSelect = document.getElementById('skin-select');
+skinSelect.value = activeSkin;
+applyNeonBackground();
+
+skinSelect.addEventListener('change', () => {
+  activeSkin = skinSelect.value;
+  localStorage.setItem('tetris-skin', activeSkin);
+  applyNeonBackground();
+  draw();
+  drawNext();
+});
 
 init();
